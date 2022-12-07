@@ -1,6 +1,4 @@
-import { StatusBar } from 'expo-status-bar';
 import { 
-  StyleSheet,
   Text, 
   View,
   SafeAreaView,
@@ -8,13 +6,15 @@ import {
 } from 'react-native';
 import styles from './style';
 import { Camera } from 'expo-camera';
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { FontAwesome } from "@expo/vector-icons"
 
 export default function App() {
 
+  const camRef = useRef(null)
   const [type, setType] = useState(Camera.Constants.Type.back)
   const [hasPermission, setHasPermission] = useState(null)
+  const [capturedPhoto, setCapturedPhoto] = useState(null)
 
   //permissiom for use camera
   useEffect(() => {
@@ -30,6 +30,16 @@ export default function App() {
   if(hasPermission === false){
     return <Text>Acesso negado</Text>
   }
+
+  //função que captura a imagem
+  async function takePicture(){
+    if (camRef){
+      const data = await camRef.current.takePictureAsync();
+        setCapturedPhoto(data.uri)
+      console.log(data);
+    }
+  }
+
   return (
     <SafeAreaView style={styles.initView}>
       <Camera
@@ -47,6 +57,11 @@ export default function App() {
             )}
           >
             <FontAwesome name="exchange" size={23} color={"red"}></FontAwesome>
+          </TouchableOpacity>
+          <TouchableOpacity
+          style={styles.buttonCamera}
+          onPress={takePicture}>
+            <FontAwesome name="camera" size={23} color="#fff"></FontAwesome>
           </TouchableOpacity>
         </View>
       </Camera>
